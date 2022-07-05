@@ -1,5 +1,13 @@
 package main
 
+import (
+	"fmt"
+
+	"github.com/NRO1/MonsterKillerGame_GoLang/interaction"
+)
+
+var currentRound = 0
+
 func main() {
 	startGame()
 
@@ -14,8 +22,19 @@ func main() {
 
 }
 
-func startGame() {}
+func startGame() {
+	interaction.PrintGreeting()
+}
 
-func executeRound() string {}
+func executeRound() string {
+	currentRound++
+	isSpecialRound := currentRound%3 == 0
+
+	interaction.ShowActions(isSpecialRound)
+	userChoice := interaction.PlayerChoice(isSpecialRound)
+
+	fmt.Println(userChoice)
+	return ""
+}
 
 func endGame() {}
