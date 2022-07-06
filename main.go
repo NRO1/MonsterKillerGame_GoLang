@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
-
+	"github.com/NRO1/MonsterKillerGame_GoLang/actions"
 	"github.com/NRO1/MonsterKillerGame_GoLang/interaction"
 )
 
 var currentRound = 0
+var gameRounds = []interaction.RoundData{}
 
 func main() {
 	startGame()
@@ -18,8 +18,7 @@ func main() {
 		winner = executeRound()
 	}
 
-	endGame()
-
+	endGame(winner)
 }
 
 func startGame() {
@@ -33,8 +32,45 @@ func executeRound() string {
 	interaction.ShowActions(isSpecialRound)
 	userChoice := interaction.PlayerChoice(isSpecialRound)
 
-	fmt.Println(userChoice)
+	var playerAttackDmg int
+	var playerHealVal int
+	var monsterAttackDmg int
+
+	if userChoice == "ATTACK" {
+		playerAttackDmg = actions.AttackMonster(false)
+	} else if userChoice == "HEAL" {
+		playerHealVal = actions.Heal()
+	} else {
+		playerAttackDmg = actions.AttackMonster(true)
+	}
+
+	monsterAttackDmg = actions.AttackPlayer()
+
+	plHealth, moHealth := actions.GetHealthAmounts()
+
+	roundData := interaction.RoundData{
+		Action:           userChoice,
+		PlayerHealth:     plHealth,
+		MonsterHealth:    moHealth,
+		PlayerAttackDmg:  playerAttackDmg,
+		PlayerHealVal:    playerHealVal,
+		MonsterAttackDmg: monsterAttackDmg,
+	}
+
+	interaction.ShowRoundStats(&roundData)
+
+	gameRounds = append(gameRounds, roundData)
+
+	if plHealth <= 0 {
+		return "Monster"
+	} else if moHealth <= 0 {
+		return "Player"
+	}
+
 	return ""
 }
 
-func endGame() {}
+func endGame(winner string) {
+	interaction.DeclareWinner(winner)
+	interaction.WriteLogFile(&gameRounds)
+}
