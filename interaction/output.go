@@ -3,6 +3,9 @@ package interaction
 import (
 	"fmt"
 	"os"
+	"path/filepath"
+
+	"github.com/common-nighthawk/go-figure"
 )
 
 //Collecting game data for display
@@ -15,9 +18,10 @@ type RoundData struct {
 	MonsterHealth    int
 }
 
-//Greeting the player in the begining of the game
+//Greeting the player in the begining of the game, using 3rd party pack=age of ASCII art
 func PrintGreeting() {
-	fmt.Println("MONSTER SLAYER")
+	ascFigure := figure.NewFigure("MONSTER SLAYER", "", true)
+	ascFigure.Print()
 	fmt.Println("Starting a new game...")
 }
 
@@ -51,13 +55,21 @@ func ShowRoundStats(RoundData *RoundData) {
 
 func DeclareWinner(winner string) {
 	fmt.Println("<------------------>")
-	fmt.Println("GAME OVER!")
+	ascFigure := figure.NewColorFigure("Game over", "", "green", true)
+	ascFigure.Print()
 	fmt.Println("<------------------>")
 	fmt.Printf("%v is the WINNER \n", winner)
 }
 
 func WriteLogFile(rounds *[]RoundData) {
-	file, err := os.Create("GameLog.txt")
+	exPath, err := os.Executable() //creating an executable path, so we could build this app to be a standalone app
+	if err != nil {
+		fmt.Println("Writing log file failed. Exiting")
+	}
+
+	exPath = filepath.Dir(exPath) //Absolute path to where the executable file is
+
+	file, err := os.Create(exPath + "/GameLog.txt")
 
 	if err != nil {
 		fmt.Println("Log file could not be created. Exiting")
